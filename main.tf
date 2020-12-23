@@ -94,13 +94,20 @@ resource "aws_launch_template" "foobar" {
 resource "aws_autoscaling_group" "bar" {
   availability_zones = ["us-east-2a", "us-east-2b"]
   desired_capacity   = 1
-  max_size           = 3
+  max_size           = 5
   min_size           = 1
 
   launch_template {
     id      = aws_launch_template.foobar.id
     version = "$Latest"
   }
+
+  tag {
+    key                 = "foo"
+    value               = "bar"
+    propagate_at_launch = true
+  }
+
 }
 
 # Third is the autoscaling plan
@@ -140,21 +147,4 @@ scaling_instruction {
       predefined_load_metric_type = "ASGTotalCPUUtilization"
     }
   }
-}
-
-# Creating the Autoscaling notifications using the SNS topic we made earlier
-
-resource "aws_autoscaling_notification" "example_notifications" {
-  group_names = [
-    aws_autoscaling_group.bar.name,
-  ]
-
-  notifications = [
-    "autoscaling:EC2_INSTANCE_LAUNCH",
-    "autoscaling:EC2_INSTANCE_TERMINATE",
-    "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
-    "autoscaling:EC2_INSTANCE_TERMINATE_ERROR",
-  ]
-
-  topic_arn = aws_sns_topic.autoscale_updates.arn
 }
