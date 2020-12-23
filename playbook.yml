@@ -1,0 +1,30 @@
+---
+- name: Putting stress on Auto Scaling Group
+  become: true
+  hosts: all
+  remote_user: ec2-user
+
+  tasks:
+    - name: Install epel
+      become: yes
+      shell: "amazon-linux-extras install epel -y"
+
+    - name: Install stress
+      become: yes
+      yum:
+        name: stress
+        state: present
+
+    - name: Run stress
+      become: yes
+      shell: "stress --cpu 2000 --timeout 60"
+
+    - name: Run stress one more time
+      become: yes
+      shell: "stress --cpu 2000 --timeout 60"
+
+    - name: Run stress one more time (I promise)
+      become: yes
+      shell: "stress --cpu 2000 --timeout 60"
+
+  
